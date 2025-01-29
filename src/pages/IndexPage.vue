@@ -1,44 +1,14 @@
 <template>
   <q-page>
     <input type="file" ref="file" style="display: none" @change="onChange" />
-    <q-dialog
-      v-model="showInfoDialog"
-      persistent
-      maximized
-      transition-show="slide-up"
-      transition-hide="slide-down"
-    >
-      <q-card class="">
-        <q-bar>
-          <q-space />
-
-          <q-btn dense flat icon="close" v-close-popup>
-            <q-tooltip class="bg-white text-primary">Close</q-tooltip>
-          </q-btn>
-        </q-bar>
-
-        <q-card-section>
-          <div class="text-h6">Запрос</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none ">
-          <textarea class="full-width" :value="modalData.clientRequest.Body"></textarea>
-        </q-card-section>
-
-        <q-card-section>
-          <div class="text-h6">Ответ</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none full-width row wrap justify-start items-start content-end">
-          <textarea class="full-width" :value="modalData.clientResponse.Body"></textarea>
-        </q-card-section>
-      </q-card>
+    <q-dialog maximized v-model="showInfoDialog" persistent transition-show="slide-up" transition-hide="slide-down">
+      <RequestInfo :rdata="modalData" />
     </q-dialog>
     <div class="q-pa-sm">
       <q-btn label="Экспорт данных" @click="exportData"></q-btn>
       <q-btn label="Импорт данных" @click="$refs.file.click()"></q-btn>
     </div>
-    <q-table flat bordered :rows="clientData" :columns="columns" row-key="name">
+    <q-table flat bordered :rows="clientData" :columns="columns" row-key="url">
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
           <div>
@@ -49,7 +19,14 @@
       <template v-slot:body-cell-method="props">
         <q-td :props="props">
           <div>
-            <q-badge :color="getMethodColor(props.val)" :label="props.value" />
+            <q-badge :color="getMethodColor(props.value)" :label="props.value" />
+          </div>
+        </q-td>
+      </template>
+      <template v-slot:body-cell-status="props">
+        <q-td :props="props">
+          <div>
+            <q-badge :color="getStatusColor(props.value)" :label="props.value" />
           </div>
         </q-td>
       </template>
@@ -58,11 +35,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, isProxy, toRaw } from 'vue'
+import RequestInfo from '../components/RequestInfo.vue'
 
 const clientData = ref([])
-const modalData = ref(null);
-const showInfoDialog = ref(false);
+const modalData = ref(null)
+const showInfoDialog = ref(false)
 const columns = [
   {
     name: 'action',
@@ -80,6 +58,28 @@ const columns = [
     label: 'URL',
     align: 'left',
     field: (row) => row.clientRequest.URL,
+    sortable: true,
+  },
+  {
+    name: 'status',
+    label: 'Статус',
+    align: 'left',
+    field: (row) => row.clientResponse.Status,
+    sortable: true,
+  },
+  {
+    name: 'user-agent',
+    label: 'User-Agent',
+    align: 'left',
+    // field: (row) => row.clientRequest.Header['User-Agent'],
+    field: (row) => {
+      if (isProxy(row.clientRequest.Header)) {
+        const headers = toRaw(row.clientRequest.Header)
+        const result = headers['User-Agent']
+        return result[0].children
+      }
+      return ''
+    },
     sortable: true,
   },
   {
@@ -128,6 +128,13 @@ function getMethodColor(val) {
   }
   return 'orange'
 }
+
+function getStatusColor(val) {
+  if (val == 200 || val == 201) {
+    return 'green'
+  }
+  return 'red'
+}
 const isConnected = ref(false)
 
 socket.onopen = () => {
@@ -175,17 +182,17 @@ function onChange(e) {
 
   reader.onload = function () {
     let data = JSON.parse(reader.result)
-    clientData.value = data
+    clientData.value = clientData.value.concat(data)
   }
 
   reader.onerror = function () {
     console.log(reader.error)
   }
 }
-function showInfo(data){
+function showInfo(data) {
   modalData.value = data
   console.log(modalData)
-  showInfoDialog.value = true;
+  showInfoDialog.value = true
 }
 
 //
