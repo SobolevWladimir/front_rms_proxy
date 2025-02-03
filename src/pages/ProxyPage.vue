@@ -74,7 +74,7 @@ const editForm = ref({
   fakeRmsId: null,
   fakeContent: 'dfsdfsd',
 })
-let editIndex = 0;
+let editIndex = 0
 
 const columns = [
   {
@@ -150,7 +150,7 @@ function editItem(item, index) {
   editForm.value.fakeContent = item.fakeContent
   isEdit.value = true
   showEditModal.value = true
-  editIndex = index;
+  editIndex = index
 }
 function deleteItem(index) {
   pageData.value.list.splice(index, 1)
@@ -165,7 +165,6 @@ function onSubmit() {
     return
   }
   let item = pageData.value[editIndex]
-
 
   item.path = editForm.value.path
   item.replaceByFakeRms = editForm.value.replaceByFakeRms

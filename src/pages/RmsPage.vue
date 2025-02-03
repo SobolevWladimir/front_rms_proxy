@@ -177,7 +177,6 @@ function onSubmit() {
     pageData.value.list[i] = item
   }
   saveDataOnServer()
-
 }
 function saveDataOnServer() {
   axios.post('/setting/rms', pageData.value)
