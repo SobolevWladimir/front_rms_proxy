@@ -10,12 +10,19 @@
     >
       <RequestInfo :rdata="modalData" />
     </q-dialog>
-    <div class="q-pa-sm">
-      <q-btn label="Экспорт данных" @click="exportData"></q-btn>
-      <q-btn label="Импорт данных" @click="$refs.file.click()"></q-btn>
-    </div>
-    <q-table flat bordered :rows="clientData" :columns="columns" :pagination="tablePagination" :filter="filter" row-key="url">
+    <q-table
+      flat
+      bordered
+      :rows="clientData"
+      :columns="columns"
+      :pagination="tablePagination"
+      :filter="filter"
+      row-key="url"
+    >
       <template v-slot:top>
+        <q-btn label="Экспорт данных" @click="exportData"></q-btn>
+        <q-btn label="Импорт данных" @click="$refs.file.click()"></q-btn>
+        <q-space />
         <q-input borderless dense debounce="300" color="primary" v-model="filter">
           <template v-slot:append>
             <q-icon name="search" />
@@ -25,7 +32,7 @@
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
           <div>
-            <q-btn outline no-caps icon="info" @click="showInfo(props.row)"></q-btn>
+            <q-btn color="blue" size="sm" no-caps icon="info" @click="showInfo(props.row)"></q-btn>
           </div>
         </q-td>
       </template>
@@ -142,7 +149,7 @@ function getMethodColor(val) {
     return 'green'
   }
   if (val == 'POST') {
-    return 'yellod'
+    return 'yellow'
   }
   if (val == 'PUT') {
     return 'blue'
