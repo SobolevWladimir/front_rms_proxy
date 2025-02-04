@@ -1,14 +1,27 @@
 <template>
   <q-page>
     <input type="file" ref="file" style="display: none" @change="onChange" />
-    <q-dialog maximized v-model="showInfoDialog" persistent transition-show="slide-up" transition-hide="slide-down">
+    <q-dialog
+      maximized
+      v-model="showInfoDialog"
+      persistent
+      transition-show="slide-up"
+      transition-hide="slide-down"
+    >
       <RequestInfo :rdata="modalData" />
     </q-dialog>
     <div class="q-pa-sm">
       <q-btn label="Экспорт данных" @click="exportData"></q-btn>
       <q-btn label="Импорт данных" @click="$refs.file.click()"></q-btn>
     </div>
-    <q-table flat bordered :rows="clientData" :columns="columns" row-key="url">
+    <q-table flat bordered :rows="clientData" :columns="columns" :pagination="tablePagination" :filter="filter" row-key="url">
+      <template v-slot:top>
+        <q-input borderless dense debounce="300" color="primary" v-model="filter">
+          <template v-slot:append>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+      </template>
       <template v-slot:body-cell-action="props">
         <q-td :props="props">
           <div>
@@ -41,6 +54,14 @@ import RequestInfo from '../components/RequestInfo.vue'
 const clientData = ref([])
 const modalData = ref(null)
 const showInfoDialog = ref(false)
+const filter = ref('')
+const tablePagination = ref({
+  sortBy: null,
+  descending: false,
+  page: 1,
+  rowsPerPage: 1000,
+  // rowsNumber: xx if getting data from a server
+})
 const columns = [
   {
     name: 'action',
@@ -101,13 +122,16 @@ const columns = [
     label: 'Перенаправлен на',
     align: 'left',
     field: (row) => {
+      function getName(rms) {
+        return `${rms.name}(${rms.url})`
+      }
       if (row.isProxy) {
         if (row.proxyTo.replaceByFakeRms) {
-          return row.proxyTo.fakeRms.url
+          return getName(row.proxyTo.fakeRms)
         }
-        return row.proxyTo.fakeRms.url
+        return getName(row.proxyTo.fakeRms)
       }
-      return row.mainRms.url
+      return getName(row.mainRms)
     },
     sortable: true,
   },
