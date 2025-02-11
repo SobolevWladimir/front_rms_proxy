@@ -19,7 +19,7 @@
             <q-input filled v-model="editForm.password" label="Пароль" hint="" lazy-rules />
             <q-checkbox v-model="editForm.needPassEncrupt" label="Зашифровать пароль в  sha1" />
 
-            <q-input filled v-model="editForm.listenPort" label="Порт" hint="Если не знаешь для чего, оставь пустым"
+            <q-input filled v-model="editForm.domain" label="Порт" hint="Если не знаешь для чего, оставь пустым"
               lazy-rules />
 
             <div>
@@ -67,7 +67,7 @@ const editForm = ref({
   login: 'adm',
   password: '123',
   needPassEncrupt: true,
-  listenPort: '',
+  domain: '',
 })
 
 const columns = [
@@ -103,9 +103,9 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'listenPort',
-    label: 'Слушать порт',
-    field: (row) => row.listenPort,
+    name: 'domain',
+    label: 'Слушать домен',
+    field: (row) => row.domain,
     sortable: true,
   },
   {
@@ -133,7 +133,7 @@ function addRow() {
   editForm.value.url = ''
   editForm.value.login = ''
   editForm.value.needPassEncrupt = true
-  editForm.value.listenPort = ''
+  editForm.value.domain = ''
   isEdit.value = false
   showEditModal.value = true
 }
@@ -144,7 +144,7 @@ function editItem(item) {
   editForm.value.login = item.login
   editForm.value.password = item.password
   editForm.value.needPassEncrupt = item.needPassEncrupt
-  editForm.value.listenPort = item.listenPort
+  editForm.value.domain = item.domain
   isEdit.value = true
   showEditModal.value = true
 }
@@ -173,7 +173,7 @@ function onSubmit() {
     item.login = editForm.value.login
     item.password = editForm.value.password
     item.needPassEncrupt = editForm.value.needPassEncrupt
-    item.listenPort = editForm.value.listenPort
+    item.domain = editForm.value.domain
     pageData.value.list[i] = item
   }
   saveDataOnServer()
