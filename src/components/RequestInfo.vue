@@ -7,8 +7,14 @@
         <q-tooltip class="bg-white text-primary">Close</q-tooltip>
       </q-btn>
     </q-bar>
-    <q-tabs v-model="tab" dense class="bg-grey-2 text-grey-7" active-color="primary" indicator-color="purple"
-      align="justify">
+    <q-tabs
+      v-model="tab"
+      dense
+      class="bg-grey-2 text-grey-7"
+      active-color="primary"
+      indicator-color="purple"
+      align="justify"
+    >
       <q-tab name="request" label="Запрос" />
       <q-tab name="response" label="Ответ" />
       <q-tab name="proxy" label="Прокси информация" />
@@ -18,20 +24,43 @@
     <q-tab-panels v-model="tab" animated>
       <q-tab-panel name="request">
         <q-card-section>
+          <table>
+            <tr>
+              <td>Метод:</td>
+              <td>
+                {{ rdata.clientRequest.Method }}
+              </td>
+            </tr>
+            <tr>
+              <td>URL:</td>
+              <td>
+                {{ rdata.clientRequest.URL }}
+              </td>
+            </tr>
+          </table>
+        </q-card-section>
+        <q-card-section>
           <div class="text-h6">Заголовки</div>
         </q-card-section>
-        <table>
-          <tr v-for="(val, key) in rdata.clientRequest.Header" :key="key">
-            <td>{{ key }}</td>
-            <td>{{ val }}</td>
-          </tr>
-        </table>
+        <q-card-section>
+          <table>
+            <tr v-for="(val, key) in rdata.clientRequest.Header" :key="key">
+              <td>{{ key }}</td>
+              <td>{{ val }}</td>
+            </tr>
+          </table>
+        </q-card-section>
 
         <q-card-section>
           <div class="text-h6">Тело</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <q-input :modelValue="rdata.clientRequest.Body" class="full-width" filled type="textarea" />
+          <q-input
+            :modelValue="rdata.clientRequest.Body"
+            class="full-width"
+            filled
+            type="textarea"
+          />
         </q-card-section>
       </q-tab-panel>
 
@@ -50,19 +79,48 @@
           <div class="text-h6">Тело</div>
         </q-card-section>
         <q-card-section class="q-pt-none full-width row wrap justify-start items-start content-end">
-          <q-input :modelValue="rdata.clientResponse.Body" class="full-width" filled type="textarea" />
+          <q-input
+            :modelValue="rdata.clientResponse.Body"
+            class="full-width"
+            filled
+            type="textarea"
+          />
         </q-card-section>
       </q-tab-panel>
 
       <q-tab-panel name="proxy">
-        <div v-if="rdata.isProxy">
-          <div>Спроксированно на</div>
-          {{ rdata.proxyTo }}
-        </div>
-        <div v-else>
-          <div>На основную рмс</div>
-          {{ rdata.mainRms }}
-        </div>
+        <q-card-section>
+          <table>
+            <tr>
+              <td>Был подменен:</td>
+              <td>
+                {{ rdata.isProxy ? 'Да' : 'Нет' }}
+              </td>
+            </tr>
+            <tr v-if="rdata.isProxy">
+              <td>Перенаправлен на другую рмс:</td>
+              <td>
+                {{ rdata.proxyTo.replaceByFakeRms ? 'Да' : 'Нет' }}
+              </td>
+            </tr>
+            <tr v-if="rdata.isProxy && rdata.proxyTo.replaceByFakeRms">
+              <td>Перенаправлен на</td>
+              <td>
+                {{ rdata.proxyTo.fakeRms.name }}
+              </td>
+            </tr>
+            <tr v-if="rdata.isProxy && !rdata.proxyTo.replaceByFakeRms">
+              <td>Вернули контент:</td>
+              <td>Да</td>
+            </tr>
+            <tr v-if="!rdata.isProxy">
+              <td>Запрос отправлен на :</td>
+              <td>
+                {{ rdata.mainRms.name }}
+              </td>
+            </tr>
+          </table>
+        </q-card-section>
       </q-tab-panel>
 
       <q-tab-panel name="main">
@@ -71,7 +129,7 @@
         </q-card-section>
 
         <q-card-section class="q-pt-none">
-          <XmlViewer v-if="isXml(rdata.clientRequest.Header)" :xml="rdata.clientRequest.Body" />
+          <XmlViewer v-if="isXml(rdata.clientRequest)" :xml="rdata.clientRequest.Body" />
           <div v-else>{{ rdata.clientRequest.Body }}</div>
         </q-card-section>
 
@@ -81,7 +139,7 @@
 
         <q-card-section class="q-pt-none full-width row wrap justify-start items-start content-end">
           <q-scroll-area class="full-width rounded-borders bg-grey-1" style="height: 400px">
-            <XmlViewer v-if="isXml(rdata.clientResponse.Header)" :xml="rdata.clientResponse.Body" />
+            <XmlViewer v-if="isXml(rdata.clientResponse)" :xml="rdata.clientResponse.Body" />
             <div v-else>{{ rdata.clientResponse.Body }}</div>
           </q-scroll-area>
         </q-card-section>
@@ -94,11 +152,19 @@ import { ref } from 'vue'
 import XmlViewer from 'vue3-xml-viewer'
 defineProps(['rdata'])
 const tab = ref('request')
-function isXml(header) {
-  if ('Content-Type' in header) {
-    let data = JSON.parse(JSON.stringify(header['Content-Type']))
-    console.log('test', data[0])
-    return data[0] == 'application/xml'
+function isXml(clientData) {
+  if ('Content-Type' in clientData.Header) {
+    let data = JSON.parse(JSON.stringify(clientData.Header['Content-Type']))
+    if (data[0] == 'application/xml') {
+      return true
+    }
+  }
+  let body = clientData.Body
+  if (body.length > 10) {
+    body = clientData.Body.substring(0, 10)
+    if (body.includes('<?xml')) {
+      return true
+    }
   }
 
   return false

@@ -22,6 +22,7 @@
       <template v-slot:top>
         <q-btn label="Экспорт данных" @click="exportData"></q-btn>
         <q-btn label="Импорт данных" @click="$refs.file.click()"></q-btn>
+        <q-btn label="Очистить" icon="delete_forever" @click="clientData=[]"></q-btn>
         <q-space />
         <q-input borderless dense debounce="300" color="primary" v-model="filter">
           <template v-slot:append>
@@ -136,7 +137,7 @@ const columns = [
         if (row.proxyTo.replaceByFakeRms) {
           return getName(row.proxyTo.fakeRms)
         }
-        return getName(row.proxyTo.fakeRms)
+        return "Вернули фейк данные"
       }
       return getName(row.mainRms)
     },

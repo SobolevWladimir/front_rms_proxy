@@ -92,8 +92,9 @@ const columns = [
   {
     name: 'fakeContent',
     label: 'Подменить на контент',
-    field: (row) => row.fakeContent,
+    field: (row) => row.fakeContent.length>50? row.fakeContent.slice(0,50): row.fakeContent,
     sortable: true,
+    // style: "max-width: 150px"
   },
   {
     name: 'fakeRmsId',
