@@ -22,7 +22,7 @@
       <template v-slot:top>
         <q-btn label="Экспорт данных" @click="exportData"></q-btn>
         <q-btn label="Импорт данных" @click="$refs.file.click()"></q-btn>
-        <q-btn label="Очистить" icon="delete_forever" @click="clientData=[]"></q-btn>
+        <q-btn label="Очистить" icon="delete_forever" @click="clientData = []"></q-btn>
         <q-space />
         <q-input borderless dense debounce="300" color="primary" v-model="filter">
           <template v-slot:append>
@@ -98,14 +98,16 @@ const columns = [
   },
   {
     name: 'user-agent',
-    label: 'User-Agent',
+    label: 'AuthType',
     align: 'left',
     // field: (row) => row.clientRequest.Header['User-Agent'],
     field: (row) => {
       if (isProxy(row.clientRequest.Header)) {
         const headers = toRaw(row.clientRequest.Header)
-        const result = headers['User-Agent']
-        return result[0].children
+        const result = headers['X-Resto-Authtype']
+        if (result) {
+          return result[0]
+        }
       }
       return ''
     },
@@ -137,7 +139,7 @@ const columns = [
         if (row.proxyTo.replaceByFakeRms) {
           return getName(row.proxyTo.fakeRms)
         }
-        return "Вернули фейк данные"
+        return 'Вернули фейк данные'
       }
       return getName(row.mainRms)
     },

@@ -25,18 +25,20 @@
       <q-tab-panel name="request">
         <q-card-section>
           <table>
-            <tr>
-              <td>Метод:</td>
-              <td>
-                {{ rdata.clientRequest.Method }}
-              </td>
-            </tr>
-            <tr>
-              <td>URL:</td>
-              <td>
-                {{ rdata.clientRequest.URL }}
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>Метод:</td>
+                <td>
+                  {{ rdata.clientRequest.Method }}
+                </td>
+              </tr>
+              <tr>
+                <td>URL:</td>
+                <td>
+                  {{ rdata.clientRequest.URL }}
+                </td>
+              </tr>
+            </tbody>
           </table>
         </q-card-section>
         <q-card-section>
@@ -44,10 +46,12 @@
         </q-card-section>
         <q-card-section>
           <table>
-            <tr v-for="(val, key) in rdata.clientRequest.Header" :key="key">
-              <td>{{ key }}</td>
-              <td>{{ val }}</td>
-            </tr>
+            <tbody>
+              <tr v-for="(val, key) in rdata.clientRequest.Header" :key="key">
+                <td>{{ key }}</td>
+                <td>{{ val }}</td>
+              </tr>
+            </tbody>
           </table>
         </q-card-section>
 
@@ -68,12 +72,14 @@
         <q-card-section>
           <div class="text-h6">Заголовки</div>
         </q-card-section>
-        <table>
-          <tr v-for="(val, key) in rdata.clientResponse.Header" :key="key">
-            <td>{{ key }}</td>
-            <td>{{ val }}</td>
-          </tr>
-        </table>
+        <q-card-section>
+          <table>
+            <tr v-for="(val, key) in rdata.clientResponse.Header" :key="key">
+              <td>{{ key }}</td>
+              <td>{{ val }}</td>
+            </tr>
+          </table>
+        </q-card-section>
 
         <q-card-section>
           <div class="text-h6">Тело</div>
@@ -91,58 +97,80 @@
       <q-tab-panel name="proxy">
         <q-card-section>
           <table>
-            <tr>
-              <td>Был подменен:</td>
-              <td>
-                {{ rdata.isProxy ? 'Да' : 'Нет' }}
-              </td>
-            </tr>
-            <tr v-if="rdata.isProxy">
-              <td>Перенаправлен на другую рмс:</td>
-              <td>
-                {{ rdata.proxyTo.replaceByFakeRms ? 'Да' : 'Нет' }}
-              </td>
-            </tr>
-            <tr v-if="rdata.isProxy && rdata.proxyTo.replaceByFakeRms">
-              <td>Перенаправлен на</td>
-              <td>
-                {{ rdata.proxyTo.fakeRms.name }}
-              </td>
-            </tr>
-            <tr v-if="rdata.isProxy && !rdata.proxyTo.replaceByFakeRms">
-              <td>Вернули контент:</td>
-              <td>Да</td>
-            </tr>
-            <tr v-if="!rdata.isProxy">
-              <td>Запрос отправлен на :</td>
-              <td>
-                {{ rdata.mainRms.name }}
-              </td>
-            </tr>
+            <tbody>
+              <tr>
+                <td>Был подменен:</td>
+                <td>
+                  {{ rdata.isProxy ? 'Да' : 'Нет' }}
+                </td>
+              </tr>
+              <tr v-if="rdata.isProxy">
+                <td>Перенаправлен на другую рмс:</td>
+                <td>
+                  {{ rdata.proxyTo.replaceByFakeRms ? 'Да' : 'Нет' }}
+                </td>
+              </tr>
+              <tr v-if="rdata.isProxy && rdata.proxyTo.replaceByFakeRms">
+                <td>Перенаправлен на</td>
+                <td>
+                  {{ rdata.proxyTo.fakeRms.name }}
+                </td>
+              </tr>
+
+              <template v-if="rdata.isProxy && rdata.proxyTo.replaceByFakeRms">
+                <tr>
+                  <td>Метод:</td>
+                  <td>
+                    {{ rdata.clientProxyRequest.Method }}
+                  </td>
+                </tr>
+                <tr>
+                  <td>URL:</td>
+                  <td>
+                    {{ rdata.clientProxyRequest.URL }}
+                  </td>
+                </tr>
+              </template>
+              <tr v-if="rdata.isProxy && !rdata.proxyTo.replaceByFakeRms">
+                <td>Вернули контент:</td>
+                <td>Да</td>
+              </tr>
+              <tr v-if="!rdata.isProxy">
+                <td>Запрос отправлен на :</td>
+                <td>
+                  {{ rdata.mainRms.name }}
+                </td>
+              </tr>
+            </tbody>
           </table>
         </q-card-section>
       </q-tab-panel>
 
-      <q-tab-panel name="main">
-        <q-card-section>
-          <div class="text-h6">Запрос</div>
-        </q-card-section>
+      <q-tab-panel name="main" class="row full-width">
+        <div class="col">
+          <q-card-section>
+            <div class="text-h6">Запрос</div>
+          </q-card-section>
 
-        <q-card-section class="q-pt-none">
-          <XmlViewer v-if="isXml(rdata.clientRequest)" :xml="rdata.clientRequest.Body" />
-          <div v-else>{{ rdata.clientRequest.Body }}</div>
-        </q-card-section>
+          <q-card-section class="q-pt-none">
+            <XmlViewer v-if="isXml(rdata.clientRequest)" :xml="rdata.clientRequest.Body" />
+            <div v-else>{{ rdata.clientRequest.Body }}</div>
+          </q-card-section>
+        </div>
+        <div class="col">
+          <q-card-section>
+            <div class="text-h6">Ответ</div>
+          </q-card-section>
 
-        <q-card-section>
-          <div class="text-h6">Ответ</div>
-        </q-card-section>
-
-        <q-card-section class="q-pt-none full-width row wrap justify-start items-start content-end">
-          <q-scroll-area class="full-width rounded-borders bg-grey-1" style="height: 400px">
-            <XmlViewer v-if="isXml(rdata.clientResponse)" :xml="rdata.clientResponse.Body" />
-            <div v-else>{{ rdata.clientResponse.Body }}</div>
-          </q-scroll-area>
-        </q-card-section>
+          <q-card-section
+            class="q-pt-none full-width row wrap justify-start items-start content-end"
+          >
+            <q-scroll-area class="full-width rounded-borders bg-grey-1" style="height: 800px">
+              <XmlViewer v-if="isXml(rdata.clientResponse)" :xml="rdata.clientResponse.Body" />
+              <div v-else>{{ rdata.clientResponse.Body }}</div>
+            </q-scroll-area>
+          </q-card-section>
+        </div>
       </q-tab-panel>
     </q-tab-panels>
   </q-card>
