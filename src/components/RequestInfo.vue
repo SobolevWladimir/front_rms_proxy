@@ -7,14 +7,8 @@
         <q-tooltip class="bg-white text-primary">Close</q-tooltip>
       </q-btn>
     </q-bar>
-    <q-tabs
-      v-model="tab"
-      dense
-      class="bg-grey-2 text-grey-7"
-      active-color="primary"
-      indicator-color="purple"
-      align="justify"
-    >
+    <q-tabs v-model="tab" dense class="bg-grey-2 text-grey-7" active-color="primary" indicator-color="purple"
+      align="justify">
       <q-tab name="request" label="Запрос" />
       <q-tab name="response" label="Ответ" />
       <q-tab name="proxy" label="Прокси информация" />
@@ -59,12 +53,7 @@
           <div class="text-h6">Тело</div>
         </q-card-section>
         <q-card-section class="q-pt-none">
-          <q-input
-            :modelValue="rdata.clientRequest.Body"
-            class="full-width"
-            filled
-            type="textarea"
-          />
+          <q-input :modelValue="rdata.clientRequest.Body" class="full-width" filled type="textarea" />
         </q-card-section>
       </q-tab-panel>
 
@@ -85,12 +74,7 @@
           <div class="text-h6">Тело</div>
         </q-card-section>
         <q-card-section class="q-pt-none full-width row wrap justify-start items-start content-end">
-          <q-input
-            :modelValue="rdata.clientResponse.Body"
-            class="full-width"
-            filled
-            type="textarea"
-          />
+          <q-input :modelValue="rdata.clientResponse.Body" class="full-width" filled type="textarea" />
         </q-card-section>
       </q-tab-panel>
 
@@ -117,20 +101,6 @@
                 </td>
               </tr>
 
-              <template v-if="rdata.isProxy && rdata.proxyTo.replaceByFakeRms">
-                <tr>
-                  <td>Метод:</td>
-                  <td>
-                    {{ rdata.clientProxyRequest.Method }}
-                  </td>
-                </tr>
-                <tr>
-                  <td>URL:</td>
-                  <td>
-                    {{ rdata.clientProxyRequest.URL }}
-                  </td>
-                </tr>
-              </template>
               <tr v-if="rdata.isProxy && !rdata.proxyTo.replaceByFakeRms">
                 <td>Вернули контент:</td>
                 <td>Да</td>
@@ -141,6 +111,28 @@
                   {{ rdata.mainRms.name }}
                 </td>
               </tr>
+
+              <template v-if="!rdata.proxyTo.replaceByFakeRms">
+              <tr>
+                <td colspan=2> Запрос к серверу </td>
+              </tr>
+              <tr>
+                <td>Метод:</td>
+                <td>
+                  {{ rdata.clientProxyRequest.Method }}
+                </td>
+              </tr>
+              <tr>
+                <td>URL:</td>
+                <td>
+                  {{ rdata.clientProxyRequest.URL }}
+                </td>
+              </tr>
+              <tr v-for="(val, key) in rdata.clientProxyRequest.Header" :key="key">
+                <td>{{ key }}</td>
+                <td>{{ val }}</td>
+              </tr>
+</template>
             </tbody>
           </table>
         </q-card-section>
@@ -162,9 +154,7 @@
             <div class="text-h6">Ответ</div>
           </q-card-section>
 
-          <q-card-section
-            class="q-pt-none full-width row wrap justify-start items-start content-end"
-          >
+          <q-card-section class="q-pt-none full-width row wrap justify-start items-start content-end">
             <q-scroll-area class="full-width rounded-borders bg-grey-1" style="height: 800px">
               <XmlViewer v-if="isXml(rdata.clientResponse)" :xml="rdata.clientResponse.Body" />
               <div v-else>{{ rdata.clientResponse.Body }}</div>
