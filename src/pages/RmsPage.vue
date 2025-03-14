@@ -19,7 +19,7 @@
             <q-input filled v-model="editForm.password" label="Пароль" hint="" lazy-rules />
             <q-checkbox v-model="editForm.needPassEncrupt" label="Зашифровать пароль в  sha1" />
 
-            <q-input filled v-model="editForm.domain" label="Порт" hint="Если не знаешь для чего, оставь пустым"
+            <q-input filled v-model="editForm.domain" label="Домен" hint="Если не знаешь для чего, оставь пустым"
               lazy-rules />
 
             <div>

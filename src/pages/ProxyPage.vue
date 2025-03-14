@@ -51,7 +51,7 @@
 
             <q-separator />
             <div class="text-subtitle1">Блок результата</div>
-            <q-checkbox v-model="editForm.replaceByFakeRms" label="Перенаправить на другую рмс" />
+            <q-checkbox v-model="editForm.replaceByFakeRms" label="Перенаправить на другую рмс (Опасно для жизни)" />
 
             <q-input
               v-if="editForm.replaceByFakeRms == false"
@@ -64,6 +64,8 @@
             />
 
             <div>{{ editForm.fakeRmsId }}</div>
+
+            <div v-if="editForm.replaceByFakeRms == true" class="text-red">Если что, мы тебя найдем!</div>
             <q-select
               v-if="editForm.replaceByFakeRms == true"
               v-model="editForm.fakeRmsId"
@@ -256,9 +258,8 @@ function onSubmit() {
   let qur = {}
   for (let i = 0; i < editForm.value.query_keys.length; i++) {
     const item = editForm.value.query_keys[i]
-    if(item.key.length>0){
-    qur[item.key] = item.value
-
+    if (item.key.length > 0) {
+      qur[item.key] = item.value
     }
   }
   if (isEdit.value == false) {
@@ -269,7 +270,6 @@ function onSubmit() {
     return
   }
   let item = pageData.value[editIndex]
-
 
   item.path = editForm.value.path
   item.replaceByFakeRms = editForm.value.replaceByFakeRms
