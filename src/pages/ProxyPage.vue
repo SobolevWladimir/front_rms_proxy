@@ -169,11 +169,10 @@ const columns = [
     sortable: true,
   },
   {
-    name: 'fakeContent',
+    name: 'hasContent',
     label: 'Подменить на контент',
-    field: (row) => (row.fakeContent.length > 50 ? row.fakeContent.slice(0, 50) : row.fakeContent),
+    field: (row) => (row.hasContent ? 'Да' : 'Нет'),
     sortable: true,
-    // style: "max-width: 150px"
   },
   {
     name: 'fakeRmsId',
@@ -226,7 +225,7 @@ function addRow() {
   isEdit.value = false
   showEditModal.value = true
 }
-function editItem(item, index) {
+async function editItem(item, index) {
   let queryKeys = []
   for (let key in item.query_keys) {
     queryKeys.push({
@@ -239,7 +238,11 @@ function editItem(item, index) {
   editForm.value.pathTo = item.pathTo
   editForm.value.replaceByFakeRms = item.replaceByFakeRms
   editForm.value.fakeRmsId = item.fakeRmsId
-  editForm.value.fakeContent = item.fakeContent
+  editForm.value.fakeContent = ''
+  if (item.hasContent) {
+    let resp = await axios.get('/setting/proxy/content', { params: { path: item.path } })
+    editForm.value.fakeContent = resp.data
+  }
   editForm.value.content = item.content
   editForm.value.is_content_contains = item.is_content_contains
   editForm.value.query_keys = queryKeys
@@ -248,7 +251,7 @@ function editItem(item, index) {
   editIndex = index
 }
 function deleteItem(index) {
-  pageData.value.list.splice(index, 1)
+  pageData.value.splice(index, 1)
   saveDataOnServer()
 }
 
